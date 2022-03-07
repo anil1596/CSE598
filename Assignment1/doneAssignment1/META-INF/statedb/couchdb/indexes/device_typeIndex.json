@@ -1,0 +1,8 @@
+{
+    "index": {
+        "fields": [ "device_type"]
+    },
+    "ddoc": "device_typeIndexDoc",
+    "name": "device_typeIndex",
+    "type": "json"
+}
