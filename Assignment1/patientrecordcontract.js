@@ -7,34 +7,34 @@ SPDX-License-Identifier: Apache-2.0
 
 'use strict';
 const { Contract, Context } = require('fabric-contract-api');
-const DeviceRecord = require('./devicerecord.js');
-const DeviceRecordList = require('./devicerecordlist.js');
+const PatientRecord = require('./patientrecord.js');
+const PatientRecordList = require('./patientrecordlist.js');
 
 
-class DeviceRecordContext extends Context {
+class PatientRecordContext extends Context {
 
     constructor() {
         super();
-        this.deviceRecordList = new DeviceRecordList(this);
+        this.patientRecordList = new PatientRecordList(this);
     }
 
 }
 
 /**
- * Define device record smart contract by extending Fabric Contract class
+ * Define patient record smart contract by extending Fabric Contract class
  *
  */
-class DeviceRecordContract extends Contract {
+class PatientRecordContract extends Contract {
 
     constructor() {
-        super('edu.asu.devicerecordcontract');
+        super('edu.asu.patientrecordcontract');
     }
 
     /**
      * Define a custom context for commercial paper
     */
     createContext() {
-        return new DeviceRecordContext();
+        return new PatientRecordContext();
     }
 
     /**
@@ -42,7 +42,7 @@ class DeviceRecordContract extends Contract {
      * @param {Context} ctx the transaction context
      */
     async init(ctx) {
-        console.log('Instantiated the device record smart contract.');
+        console.log('Instantiated the patient record smart contract.');
     }
 
     //  TASK-7: Implement the unknownTransaction to throw an error when
@@ -54,55 +54,56 @@ class DeviceRecordContract extends Contract {
         throw new Error()
     }
 
-    async afterTransaction(ctx,result){
+     async afterTransaction(ctx){
         console.log('---------------------INSIDE afterTransaction-----------------------')
         let func_and_params = ctx.stub.getFunctionAndParameters()
         console.log('---------------------func_and_params-----------------------')
         console.log(func_and_params)
-        console.log(func_and_params['fcn'] === 'createDeviceRecord' && func_and_params['params'][4]==='iot')
-        if (func_and_params['fcn'] === 'createDeviceRecord' && func_and_params['params'][4]==='AB-') {
-            ctx.stub.setEvent('rare-device-type', JSON.stringify({'serial': func_and_params.params[0]}))
+        console.log(func_and_params['fcn'] === 'createPatientRecord' && func_and_params['params'][4]==='AB-')
+        if (func_and_params['fcn'] === 'createPatientRecord' && func_and_params['params'][4]==='AB-') {
+            ctx.stub.setEvent('rare-blood-type', JSON.stringify({'username': func_and_params.params[0]}))
             console.log('Chaincode event is being created!')
         }
+
     }
     /**
-     * Create a device record
+     * Create a patient record
      * @param {Context} ctx the transaction context
-     * @param {String} serial serial
-     * @param {String} company company
-     * @param {String} manufacturingDate date of birth
-     * @param {String} price  price
-     * @param {String} device_type device type
+     * @param {String} username username
+     * @param {String} name name
+     * @param {String} dob date of birth
+     * @param {String} gender  gender
+     * @param {String} blood_type blood type
      */
-    async createDeviceRecord(ctx,serial,company,manufacturingDate,price,device_type){
-        let precord = DeviceRecord.createInstance(serial,company,manufacturingDate,price,device_type);
+    async createPatientRecord(ctx,username,name,dob,gender,blood_type){
+        let precord = PatientRecord.createInstance(username,name,dob,gender,blood_type);
         //TASK 0
-        // Add device record by calling the method in the DRecordList
+        // Add patient record by calling the method in the PRecordList
         throw new Error()
         return precord.toBuffer();
     }
 
-    async getDeviceByKey(ctx, serial, company){
-        let precordKey = DeviceRecord.makeKey([serial,company]);
-        //TASK-1: Use a method from deviceRecordList to read a record by key
+    async getPatientByKey(ctx, username, name){
+        let precordKey = PatientRecord.makeKey([username,name]);
+        //TASK-1: Use a method from patientRecordList to read a record by key
         return JSON.stringify(precord)
     }
 
 
     /**
-     * Update last_update_date to an existing record
+     * Update last_checkup_date to an existing record
      * @param {Context} ctx the transaction context
-     * @param {String} serial serial
-     * @param {String} company company
-     * @param {String} last_update_date date string 
+     * @param {String} username username
+     * @param {String} name name
+     * @param {String} last_checkup_date date string 
      */
-     async updateLastUpdate(ctx,serial,company,last_update_date){
-        let precordKey = DeviceRecord.makeKey([serial,company]);
-        //TASK-3: Use a method from deviceRecordList to read a record by key
-        //Use set_last_checkup_date from DeviceRecord to update the last_checkup_date field
-        //Use updatePRecord from deviceRecordList to update the record on the ledger
-        return precord.toBuffer();
-    }
+    /*async updateCheckupDate(ctx,username,name,last_checkup_date){
+        let precordKey = PatientRecord.makeKey([username,name]);
+        //TASK-3: Use a method from patientRecordList to read a record by key
+        //Use set_last_checkup_date from PatientRecord to update the last_checkup_date field
+        //Use updatePRecord from patientRecordList to update the record on the ledger
+       return precord.toBuffer();
+    }*/
 
 
 
@@ -153,49 +154,50 @@ class DeviceRecordContract extends Contract {
 }
 
     /**
-     * Query by Price
+     * Query by Gender
      *
      * @param {Context} ctx the transaction context
-     * @param {String} price price to be queried
+     * @param {String} gender gender to be queried
     */
-   async queryByPrice(ctx, price) {
-    //      TASK-4: Complete the query String JSON object to query using the priceIndex (META-INF folder)
-    //      Construct the JSON couch DB selector queryString that uses priceIndex
+    // Graded Function
+   /*async queryByGender(ctx, gender) {
+    //      TASK-4: Complete the query String JSON object to query using the genderIndex (META-INF folder)
+    //      Construct the JSON couch DB selector queryString that uses genderIndex
     //      Pass the Query string built to queryWithQueryString
-        return queryResults;
-    }
+ }*/
 
     /**
-     * Query by Device_Type
+     * Query by Blood_Type
      *
      * @param {Context} ctx the transaction context
-     * @param {String} device_type device_type to queried
+     * @param {String} blood_type blood_type to queried
     */
-   async queryByDevice_Type(ctx, device_type) {
-    //      TASK-5: Write a new index for deviceType and write a CouchDB selector query that uses it
-    //      to query by deviceType
-    //      Construct the JSON couch DB selector queryString that uses device_typeIndex
+    // Graded Function
+   /*async queryByBlood_Type(ctx, blood_type) {
+    //      TASK-5: Write a new index for bloodType and write a CouchDB selector query that uses it
+    //      to query by bloodType
+    //      Construct the JSON couch DB selector queryString that uses blood_typeIndex
     //      Pass the Query string built to queryWithQueryString
-        return queryResults;
-    }
+
+}*/
 
     /**
-     * Query by Device_Type Dual Query
+     * Query by Blood_Type Dual Query
      *
      * @param {Context} ctx the transaction context
-     * @param {String} device_type device_type to queried
+     * @param {String} blood_type blood_type to queried
     */
-   async queryByDevice_Type_Dual(ctx, device_type1, device_type2) {
-    //      TASK-6: Write a CouchDB selector query that queries using two device types
-    //      and uses the index created for deviceType
-    //      Construct the JSON couch DB selector queryString that uses two device type indexe
+    //Grade Function
+  /* async queryByBlood_Type_Dual(ctx, blood_type1, blood_type2) {
+    //      TASK-6: Write a CouchDB selector query that queries using two blood types
+    //      and uses the index created for bloodType
+    //      Construct the JSON couch DB selector queryString that uses two blood type indexe
     //      Pass the Query string built to queryWithQueryString
-    return queryResults;
+
+
+}*/
 
 }
 
-}
 
-
-module.exports = DeviceRecordContract;
-
+module.exports = PatientRecordContract;
