@@ -91,13 +91,13 @@ class PatientRecordContract extends Contract {
 
 
     /**
-     * Update last_checkup_date to an existing record
+     * Update lastCheckupDate to an existing record
      * @param {Context} ctx the transaction context
      * @param {String} username username
      * @param {String} name name
-     * @param {String} last_checkup_date date string 
+     * @param {String} lastCheckupDate date string 
      */
-    /*async updateCheckupDate(ctx,username,name,last_checkup_date){
+    /*async updateCheckupDate(ctx,username,name,lastCheckupDate){
         let precordKey = PatientRecord.makeKey([username,name]);
         //TASK-3: Use a method from patientRecordList to read a record by key
         //Use set_last_checkup_date from PatientRecord to update the last_checkup_date field
